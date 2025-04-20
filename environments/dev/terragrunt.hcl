@@ -7,8 +7,14 @@ remote_state {
   config = {
     bucket         = "web-scraping-terraform-state"
     key            = "dev/${path_relative_to_include()}/terraform.tfstate"
-    region         = "af-south-1"
+    region         = local.aws_region
     encrypt        = true
     dynamodb_table = "web-scraping-terraform-locks"
   }
+}
+
+locals {
+  aws_region           = "af-south-1"
+  artefact_bucket_name = "web-scraper-artefacts-dev-af-south-1"
+  environment          = "dev"
 }

@@ -7,8 +7,12 @@ terraform {
   source = "../../../src//modules//artefacts"
 }
 
+locals {
+  base = include.root.locals
+}
+
 inputs = {
-  environment = "dev"
-  aws_region  = "af-south-1"
-  bucket_name = "web-scraper-artefacts-dev-af-south-1"
+  environment = local.base.environment
+  aws_region  = local.base.aws_region
+  bucket_name = local.base.artefact_bucket_name
 }
