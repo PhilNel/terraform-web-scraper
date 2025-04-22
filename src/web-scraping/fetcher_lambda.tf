@@ -1,3 +1,9 @@
+data "aws_s3_object" "fetcher_lambda" {
+  bucket = var.artefact_bucket
+  key    = "fetcher_lambda.zip"
+}
+
+
 resource "aws_lambda_function" "fetcher_lambda" {
   function_name = "fetcher_lambda"
   role          = aws_iam_role.fetcher_lambda_exec.arn
@@ -5,9 +11,11 @@ resource "aws_lambda_function" "fetcher_lambda" {
   runtime       = "nodejs22.x"
   memory_size   = var.fetcher_memory_size
   timeout       = var.fetcher_timeout_in_seconds
+  publish       = true
 
-  s3_bucket = var.artefact_bucket
-  s3_key    = "fetcher_lambda.zip"
+  s3_bucket         = data.aws_s3_object.fetcher_lambda.bucket
+  s3_key            = data.aws_s3_object.fetcher_lambda.key
+  s3_object_version = data.aws_s3_object.fetcher_lambda.version_id
 
   environment {
     variables = {
@@ -16,6 +24,12 @@ resource "aws_lambda_function" "fetcher_lambda" {
       NODE_ENV              = "production"
     }
   }
+}
+
+resource "aws_lambda_alias" "latest" {
+  name             = "latest"
+  function_name    = aws_lambda_function.fetcher_lambda.function_name
+  function_version = aws_lambda_function.fetcher_lambda.version
 }
 
 resource "aws_iam_role" "fetcher_lambda_exec" {
