@@ -23,3 +23,7 @@ resource "aws_s3_bucket_versioning" "artefacts" {
     status = "Enabled"
   }
 }
+
+resource "aws_ecr_repository" "parser_lambda" {
+  name = "parser-lambda"
+}
