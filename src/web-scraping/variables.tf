@@ -22,3 +22,20 @@ variable "fetcher_memory_size" {
   type        = number
   default     = 1024
 }
+
+variable "parser_timeout_in_seconds" {
+  description = "The number of seconds that the parser is allowed to run before failing."
+  type        = number
+  default     = 30
+}
+
+variable "parser_version" {
+  description = "The version of the parser lambda to deploy."
+  type        = string
+}
+
+variable "parser_memory_size" {
+  description = "The memory size of the parser lambda."
+  type        = number
+  default     = 256
+}
