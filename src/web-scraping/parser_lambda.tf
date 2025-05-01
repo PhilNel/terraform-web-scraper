@@ -4,7 +4,7 @@ data "aws_ecr_repository" "parser_lambda" {
 
 
 resource "aws_lambda_function" "parser_lambda" {
-  function_name = "parser_lambda"
+  function_name = "parser-lambda"
   package_type  = "Image"
   role          = aws_iam_role.parser_lambda_exec.arn
   memory_size   = var.parser_memory_size

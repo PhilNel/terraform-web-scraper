@@ -5,7 +5,7 @@ data "aws_s3_object" "fetcher_lambda" {
 
 
 resource "aws_lambda_function" "fetcher_lambda" {
-  function_name = "fetcher_lambda"
+  function_name = "fetcher-lambda"
   role          = aws_iam_role.fetcher_lambda_exec.arn
   handler       = "src/index.handler"
   runtime       = "nodejs22.x"
