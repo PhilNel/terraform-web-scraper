@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.11.0"
+  required_version = ">= 1.10.0"
 
   required_providers {
     aws = {
@@ -16,6 +16,18 @@ provider "aws" {
 resource "aws_s3_bucket" "artefact" {
   bucket        = var.bucket_name
   force_destroy = true
+}
+
+# Customer-managed KMS not required for this artifact bucket since it only contains binaries.
+# tfsec:ignore:AVD-AWS-0132
+resource "aws_s3_bucket_server_side_encryption_configuration" "artefact_encryption" {
+  bucket = aws_s3_bucket.artefact.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "artefact_block" {
@@ -37,4 +49,10 @@ resource "aws_s3_bucket_versioning" "artefacts" {
 
 resource "aws_ecr_repository" "parser_lambda" {
   name = "parser-lambda"
+
+  image_tag_mutability = "IMMUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
