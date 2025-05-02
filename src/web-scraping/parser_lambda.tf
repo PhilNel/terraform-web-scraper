@@ -11,7 +11,7 @@ resource "aws_lambda_function" "parser_lambda" {
   timeout       = var.parser_timeout_in_seconds
   publish       = true
 
-  image_uri     = "${data.aws_ecr_repository.parser_lambda.repository_url}:${var.parser_version}"
+  image_uri = "${data.aws_ecr_repository.parser_lambda.repository_url}:${var.parser_version}"
 
   environment {
     variables = {
