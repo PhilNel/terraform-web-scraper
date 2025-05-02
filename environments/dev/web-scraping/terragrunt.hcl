@@ -15,5 +15,5 @@ inputs = {
   aws_region      = local.base.aws_region
   artefact_bucket = local.base.artefact_bucket_name
   environment     = local.base.environment
-  parser_version  = "20250429-1808-26298c3"
+  parser_version  = "20250502-1554-68a42cd"
 }
