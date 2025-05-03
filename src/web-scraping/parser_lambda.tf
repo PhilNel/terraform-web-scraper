@@ -2,7 +2,6 @@ data "aws_ecr_repository" "parser_lambda" {
   name = "parser-lambda"
 }
 
-
 resource "aws_lambda_function" "parser_lambda" {
   function_name = "parser-lambda"
   package_type  = "Image"
@@ -17,7 +16,9 @@ resource "aws_lambda_function" "parser_lambda" {
     variables = {
       PROVIDER_S3_BUCKET_NAME = aws_s3_bucket.fetcher_output.bucket
       PROVIDER_S3_BUCKET_KEY  = "rendered.html"
-      SCRAPER_PROVIDER_TYPE   = "s3"
+      SCRAPER_PROVIDER_TYPE   = "s3",
+      STORE_DYNAMO_TABLE_NAME = aws_dynamodb_table.job_store.id,
+      SCRAPER_SINK_TYPE       = "dynamo",
     }
   }
 }
@@ -76,6 +77,32 @@ resource "aws_iam_policy" "parser_lambda_s3" {
 resource "aws_iam_role_policy_attachment" "parser_lambda_s3_attach" {
   role       = aws_iam_role.parser_lambda_exec.name
   policy_arn = aws_iam_policy.parser_lambda_s3.arn
+}
+
+data "aws_iam_policy_document" "parser_lambda_dynamo_access" {
+  statement {
+    actions = [
+      "dynamodb:PutItem",
+      "dynamodb:GetItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:Query",
+      "dynamodb:Scan"
+    ]
+
+    resources = [
+      aws_dynamodb_table.job_store.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "parser_lambda_dynamo" {
+  name   = "parser_lambda_dynamo_policy"
+  policy = data.aws_iam_policy_document.parser_lambda_dynamo_access.json
+}
+
+resource "aws_iam_role_policy_attachment" "parser_lambda_dynamo_attach" {
+  role       = aws_iam_role.parser_lambda_exec.name
+  policy_arn = aws_iam_policy.parser_lambda_dynamo.arn
 }
 
 resource "aws_iam_role_policy_attachment" "parser_lambda_logs" {

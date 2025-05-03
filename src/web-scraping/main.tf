@@ -38,3 +38,16 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "fetcher_output" {
     }
   }
 }
+
+resource "aws_dynamodb_table" "job_store" {
+  name         = "web-scraper-jobs-${var.environment}-${var.aws_region}"
+  billing_mode = "PAY_PER_REQUEST"
+
+  hash_key = "job_id"
+
+  attribute {
+    name = "job_id"
+    type = "S"
+  }
+}
+
