@@ -1,11 +1,10 @@
 data "aws_s3_object" "fetcher_lambda" {
   bucket = var.artefact_bucket
-  key    = "fetcher_lambda.zip"
+  key    = "node-fetcher-lambda.zip"
 }
 
-
 resource "aws_lambda_function" "fetcher_lambda" {
-  function_name = "fetcher-lambda"
+  function_name = "node-fetcher-lambda"
   role          = aws_iam_role.fetcher_lambda_exec.arn
   handler       = "src/index.handler"
   runtime       = "nodejs22.x"

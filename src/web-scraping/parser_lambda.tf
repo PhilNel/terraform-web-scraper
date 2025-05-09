@@ -1,9 +1,24 @@
-data "aws_ecr_repository" "parser_lambda" {
-  name = "parser-lambda"
+locals {
+  parser_env_vars = {
+    PROVIDER_S3_BUCKET_NAME = aws_s3_bucket.fetcher_output.bucket
+    PROVIDER_S3_BUCKET_KEY  = "rendered.html"
+    SCRAPER_PROVIDER_TYPE   = "s3"
+    STORE_DYNAMO_TABLE_NAME = aws_dynamodb_table.job_store.id
+    SCRAPER_SINK_TYPE       = "dynamo"
+  }
 }
 
-resource "aws_lambda_function" "parser_lambda" {
-  function_name = "parser-lambda"
+data "aws_s3_object" "parser_lambda" {
+  bucket = var.artefact_bucket
+  key    = "go-parser-lambda.zip"
+}
+
+data "aws_ecr_repository" "parser_lambda" {
+  name = "perl-parser-lambda"
+}
+
+resource "aws_lambda_function" "perl_parser_lambda" {
+  function_name = "perl-parser-lambda"
   package_type  = "Image"
   role          = aws_iam_role.parser_lambda_exec.arn
   memory_size   = var.parser_memory_size
@@ -13,20 +28,37 @@ resource "aws_lambda_function" "parser_lambda" {
   image_uri = "${data.aws_ecr_repository.parser_lambda.repository_url}:${var.parser_version}"
 
   environment {
-    variables = {
-      PROVIDER_S3_BUCKET_NAME = aws_s3_bucket.fetcher_output.bucket
-      PROVIDER_S3_BUCKET_KEY  = "rendered.html"
-      SCRAPER_PROVIDER_TYPE   = "s3",
-      STORE_DYNAMO_TABLE_NAME = aws_dynamodb_table.job_store.id,
-      SCRAPER_SINK_TYPE       = "dynamo",
-    }
+    variables = local.parser_env_vars
   }
 }
 
-resource "aws_lambda_alias" "parser_latest" {
+resource "aws_lambda_alias" "perl_parser_latest" {
   name             = "latest"
-  function_name    = aws_lambda_function.parser_lambda.function_name
-  function_version = aws_lambda_function.parser_lambda.version
+  function_name    = aws_lambda_function.perl_parser_lambda.function_name
+  function_version = aws_lambda_function.perl_parser_lambda.version
+}
+
+resource "aws_lambda_function" "go_parser_lambda" {
+  function_name = "go-parser-lambda"
+  role          = aws_iam_role.parser_lambda_exec.arn
+  handler       = "handler"
+  runtime       = "provided.al2"
+  memory_size   = var.parser_memory_size
+  timeout       = var.parser_timeout_in_seconds
+  publish       = true
+
+  s3_bucket         = data.aws_s3_object.parser_lambda.bucket
+  s3_key            = data.aws_s3_object.parser_lambda.key
+  s3_object_version = data.aws_s3_object.parser_lambda.version_id
+  environment {
+    variables = local.parser_env_vars
+  }
+}
+
+resource "aws_lambda_alias" "go_parser_latest" {
+  name             = "latest"
+  function_name    = aws_lambda_function.go_parser_lambda.function_name
+  function_version = aws_lambda_function.go_parser_lambda.version
 }
 
 resource "aws_iam_role" "parser_lambda_exec" {
