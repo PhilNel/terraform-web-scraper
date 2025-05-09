@@ -29,13 +29,13 @@ variable "parser_timeout_in_seconds" {
   default     = 30
 }
 
-variable "parser_version" {
-  description = "The version of the parser lambda to deploy."
-  type        = string
-}
-
 variable "parser_memory_size" {
   description = "The memory size of the parser lambda."
   type        = number
   default     = 256
+}
+
+variable "parser_version" {
+  description = "The version of the Perl parser lambda to deploy."
+  type        = string
 }

@@ -48,7 +48,7 @@ resource "aws_s3_bucket_versioning" "artefacts" {
 }
 
 resource "aws_ecr_repository" "parser_lambda" {
-  name = "parser-lambda"
+  name = "perl-parser-lambda"
 
   image_tag_mutability = "IMMUTABLE"
 
