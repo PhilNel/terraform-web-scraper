@@ -6,7 +6,7 @@ data "aws_s3_object" "fetcher_lambda" {
 resource "aws_lambda_function" "fetcher_lambda" {
   function_name = "node-fetcher-lambda"
   role          = aws_iam_role.fetcher_lambda_exec.arn
-  handler       = "src/index.handler"
+  handler       = "index.handler"
   runtime       = "nodejs22.x"
   memory_size   = var.fetcher_memory_size
   timeout       = var.fetcher_timeout_in_seconds
@@ -47,7 +47,6 @@ resource "aws_iam_role" "fetcher_lambda_exec" {
     ]
   })
 }
-
 
 data "aws_iam_policy_document" "fetcher_lambda_s3_access" {
   statement {
