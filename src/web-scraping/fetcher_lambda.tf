@@ -4,7 +4,7 @@ data "aws_s3_object" "fetcher_lambda" {
 }
 
 resource "aws_lambda_function" "fetcher_lambda" {
-  function_name = "node-fetcher-lambda"
+  function_name = "${local.prefix}node-fetcher-lambda"
   role          = aws_iam_role.fetcher_lambda_exec.arn
   handler       = "index.handler"
   runtime       = "nodejs22.x"
@@ -32,7 +32,7 @@ resource "aws_lambda_alias" "latest" {
 }
 
 resource "aws_iam_role" "fetcher_lambda_exec" {
-  name = "fetcher_lambda_exec_role"
+  name = "${local.prefix}fetcher-lambda-exec"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "fetcher_lambda_s3_access" {
 }
 
 resource "aws_iam_policy" "fetcher_lambda_s3" {
-  name   = "fetcher_lambda_s3_policy"
+  name   = "${local.prefix}fetcher-lambda-s3-policy"
   policy = data.aws_iam_policy_document.fetcher_lambda_s3_access.json
 }
 
@@ -77,13 +77,13 @@ resource "aws_iam_role_policy_attachment" "fetcher_lambda_logs" {
 
 resource "aws_cloudwatch_event_target" "fetcher_target" {
   rule      = aws_cloudwatch_event_rule.fetcher_schedule.name
-  target_id = "fetcher-lambda-${var.environment}-${var.aws_region}"
+  target_id = "${local.prefix}fetcher-lambda"
   arn       = aws_lambda_function.fetcher_lambda.arn
 }
 
 
 resource "aws_cloudwatch_event_rule" "fetcher_schedule" {
-  name                = "fetcher-lambda-schedule-${var.environment}-${var.aws_region}"
+  name                = "${local.prefix}fetcher-lambda-schedule"
   description         = "Run fetcher lambda"
   schedule_expression = var.fetcher_schedule_expression
   state               = "ENABLED"
