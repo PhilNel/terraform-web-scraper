@@ -21,6 +21,7 @@ resource "aws_lambda_function" "fetcher_lambda" {
       WRITER_S3_BUCKET_NAME = aws_s3_bucket.fetcher_output.bucket
       WRITER_TYPE           = "s3"
       NODE_ENV              = "production"
+      SITES_TO_FETCH        = jsonencode(var.sites_to_fetch)
     }
   }
 }

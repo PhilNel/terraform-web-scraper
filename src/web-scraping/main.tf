@@ -44,7 +44,7 @@ resource "aws_s3_bucket_notification" "eventbridge" {
 }
 
 resource "aws_dynamodb_table" "job_store" {
-  name         = "${local.prefix}web-scraper-jobs-"
+  name         = "${local.prefix}web-scraper-jobs"
   billing_mode = "PAY_PER_REQUEST"
 
   hash_key = "job_id"

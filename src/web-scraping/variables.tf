@@ -45,3 +45,11 @@ variable "fetcher_schedule_expression" {
   type        = string
   default     = "cron(0 6 * * ? *)" # 6 AM UTC daily
 }
+
+variable "sites_to_fetch" {
+  type        = map(string)
+  description = "Mapping of site names to URLs used by fetcher"
+  default = {
+    duckduckgo = "https://duckduckgo.com/jobs"
+  }
+}
