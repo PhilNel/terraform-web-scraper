@@ -15,11 +15,6 @@ locals {
 
 resource "aws_s3_bucket" "fetcher_output" {
   bucket = "${local.prefix}web-scraper-output"
-
-  tags = {
-    Name        = "web-scraper-output-dev"
-    Environment = var.environment
-  }
 }
 
 resource "aws_s3_bucket_public_access_block" "fetcher_output" {
@@ -41,6 +36,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "fetcher_output" {
       sse_algorithm = "AES256"
     }
   }
+}
+
+resource "aws_s3_bucket_notification" "eventbridge" {
+  bucket      = aws_s3_bucket.fetcher_output.id
+  eventbridge = true
 }
 
 resource "aws_dynamodb_table" "job_store" {
