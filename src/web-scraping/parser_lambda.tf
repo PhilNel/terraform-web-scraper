@@ -18,7 +18,7 @@ data "aws_ecr_repository" "parser_lambda" {
 }
 
 resource "aws_lambda_function" "perl_parser_lambda" {
-  function_name = "perl-parser-lambda"
+  function_name = "${local.prefix}perl-parser-lambda"
   package_type  = "Image"
   role          = aws_iam_role.parser_lambda_exec.arn
   memory_size   = var.parser_memory_size
@@ -39,7 +39,7 @@ resource "aws_lambda_alias" "perl_parser_latest" {
 }
 
 resource "aws_lambda_function" "go_parser_lambda" {
-  function_name = "go-parser-lambda"
+  function_name = "${local.prefix}go-parser-lambda"
   role          = aws_iam_role.parser_lambda_exec.arn
   handler       = "handler"
   runtime       = "provided.al2"
@@ -62,7 +62,7 @@ resource "aws_lambda_alias" "go_parser_latest" {
 }
 
 resource "aws_iam_role" "parser_lambda_exec" {
-  name = "parser_lambda_exec_role"
+  name = "${local.prefix}parser-lambda-exec-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -102,7 +102,7 @@ data "aws_iam_policy_document" "parser_lambda_s3_access" {
 }
 
 resource "aws_iam_policy" "parser_lambda_s3" {
-  name   = "parser_lambda_s3_policy"
+  name   = "${local.prefix}parser-lambda-s3-policy"
   policy = data.aws_iam_policy_document.parser_lambda_s3_access.json
 }
 
@@ -128,7 +128,7 @@ data "aws_iam_policy_document" "parser_lambda_dynamo_access" {
 }
 
 resource "aws_iam_policy" "parser_lambda_dynamo" {
-  name   = "parser_lambda_dynamo_policy"
+  name   = "${local.prefix}parser-lambda-dynamo-policy"
   policy = data.aws_iam_policy_document.parser_lambda_dynamo_access.json
 }
 

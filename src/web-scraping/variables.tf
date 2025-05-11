@@ -39,3 +39,9 @@ variable "parser_version" {
   description = "The version of the Perl parser lambda to deploy."
   type        = string
 }
+
+variable "fetcher_schedule_expression" {
+  description = "Schedule expression (rate or cron) for the fetcher Lambda"
+  type        = string
+  default     = "cron(0 6 * * ? *)" # 6 AM UTC daily
+}
