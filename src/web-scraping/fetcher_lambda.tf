@@ -74,25 +74,3 @@ resource "aws_iam_role_policy_attachment" "fetcher_lambda_logs" {
   role       = aws_iam_role.fetcher_lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
-
-resource "aws_cloudwatch_event_target" "fetcher_target" {
-  rule      = aws_cloudwatch_event_rule.fetcher_schedule.name
-  target_id = "${local.prefix}fetcher-lambda"
-  arn       = aws_lambda_function.fetcher_lambda.arn
-}
-
-
-resource "aws_cloudwatch_event_rule" "fetcher_schedule" {
-  name                = "${local.prefix}fetcher-lambda-schedule"
-  description         = "Run fetcher lambda"
-  schedule_expression = var.fetcher_schedule_expression
-  state               = "ENABLED"
-}
-
-resource "aws_lambda_permission" "fetcher_allow_eventbridge" {
-  statement_id  = "AllowExecutionFromEventBridge"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.fetcher_lambda.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.fetcher_schedule.arn
-}
